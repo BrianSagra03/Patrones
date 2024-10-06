@@ -1,0 +1,145 @@
+from abc import ABC, abstractmethod
+
+
+# Producto: Clase CV
+class CV:
+    def __init__(self):
+        self.secciones = []
+
+    def agregar_seccion(self, seccion):
+        self.secciones.append(seccion)
+
+    def eliminar_seccion(self, seccion):
+        self.secciones.remove(seccion)
+
+    def mostrar_cv(self):
+        return "\n".join(self.secciones)
+
+    def exportar(self, formato):
+        if formato == "PDF":
+            return f"CV exportado en formato PDF:\n{self.mostrar_cv()}"
+        elif formato == "HTML":
+            return f"<html><body>{self.mostrar_cv()}</body></html>"
+        elif formato == "Texto plano":
+            return f"CV en texto plano:\n{self.mostrar_cv()}"
+        else:
+            return "Formato no soportado."
+
+
+# Interfaz CVBuilder
+class CVBuilder(ABC):
+    @abstractmethod
+    def set_informacion_personal(self, nombre, contacto, foto):
+        pass
+
+    @abstractmethod
+    def add_experiencia_laboral(self, empresa, cargo, fechas, descripcion):
+        pass
+
+    @abstractmethod
+    def add_educacion(self, institucion, titulo, fechas):
+        pass
+
+    @abstractmethod
+    def add_habilidades(self, *habilidades):
+        pass
+
+    @abstractmethod
+    def add_proyectos(self, nombre, descripcion, tecnologias):
+        pass
+
+    @abstractmethod
+    def add_referencias(self, nombre, contacto, relacion):
+        pass
+
+    @abstractmethod
+    def obtener_cv(self):
+        pass
+
+
+# Constructor Concreto: CV Cronológico
+class CVBuilderCronologico(CVBuilder):
+    def __init__(self):
+        self.cv = CV()
+
+    def set_informacion_personal(self, nombre, contacto, foto):
+        self.cv.agregar_seccion(f"Información Personal:\nNombre: {nombre}, Contacto: {contacto}, Foto: {foto}")
+
+    def add_experiencia_laboral(self, empresa, cargo, fechas, descripcion):
+        self.cv.agregar_seccion(f"Experiencia Laboral:\nEmpresa: {empresa}, Cargo: {cargo}, Fechas: {fechas}, Descripción: {descripcion}")
+
+    def add_educacion(self, institucion, titulo, fechas):
+        self.cv.agregar_seccion(f"Educación:\nInstitución: {institucion}, Título: {titulo}, Fechas: {fechas}")
+
+    def add_habilidades(self, *habilidades):
+        self.cv.agregar_seccion(f"Habilidades:\n{', '.join(habilidades)}")
+
+    def add_proyectos(self, nombre, descripcion, tecnologias):
+        self.cv.agregar_seccion(f"Proyectos:\nNombre: {nombre}, Descripción: {descripcion}, Tecnologías: {tecnologias}")
+
+    def add_referencias(self, nombre, contacto, relacion):
+        self.cv.agregar_seccion(f"Referencias:\nNombre: {nombre}, Contacto: {contacto}, Relación: {relacion}")
+
+    def obtener_cv(self):
+        return self.cv
+
+
+# Constructor Concreto: CV Funcional
+class CVBuilderFuncional(CVBuilder):
+    def __init__(self):
+        self.cv = CV()
+
+    def set_informacion_personal(self, nombre, contacto, foto):
+        self.cv.agregar_seccion(f"Información Personal:\nNombre: {nombre}, Contacto: {contacto}, Foto: {foto}")
+
+    def add_experiencia_laboral(self, empresa, cargo, fechas, descripcion):
+        self.cv.agregar_seccion(f"Experiencia Profesional:\n{cargo} en {empresa} ({fechas}) - {descripcion}")
+
+    def add_educacion(self, institucion, titulo, fechas):
+        self.cv.agregar_seccion(f"Formación Académica:\n{titulo} en {institucion} ({fechas})")
+
+    def add_habilidades(self, *habilidades):
+        self.cv.agregar_seccion(f"Competencias Técnicas:\n{', '.join(habilidades)}")
+
+    def add_proyectos(self, nombre, descripcion, tecnologias):
+        self.cv.agregar_seccion(f"Proyectos Destacados:\n{nombre} - {descripcion} (Tecnologías: {tecnologias})")
+
+    def add_referencias(self, nombre, contacto, relacion):
+        self.cv.agregar_seccion(f"Referencias Profesionales:\n{nombre} ({relacion}) - Contacto: {contacto}")
+
+    def obtener_cv(self):
+        return self.cv
+
+
+# Director: Generador de CVs
+class GeneradorCV:
+    def __init__(self, builder: CVBuilder):
+        self.builder = builder
+
+    def construir_cv_completo(self):
+        self.builder.set_informacion_personal("Juan Pérez", "juanperez@mail.com", "foto.jpg")
+        self.builder.add_experiencia_laboral("Empresa Telco", "Desarrollador", "2019-2023", "Desarrollo de aplicaciones web.")
+        self.builder.add_educacion("Universidad UDES", "Ingeniería de Software", "2015-2019")
+        self.builder.add_habilidades("Python", "Django", "SQL", "Git")
+        self.builder.add_proyectos("Sistema de Gestión", "Plataforma para gestión de inventarios", "Python, Django, PostgreSQL")
+        self.builder.add_referencias("Carlos López", "carloslopez@mail.com", "Gerente en Empresa Atento")
+
+    def obtener_cv(self):
+        return self.builder.obtener_cv()
+
+
+# Uso del patrón Builder
+# Se puede usar cualquier CVBuilder concreto, como CVBuilderCronologico o CVBuilderFuncional
+builder_cronologico = CVBuilderCronologico()
+generador = GeneradorCV(builder_cronologico)
+generador.construir_cv_completo()
+cv_resultado = generador.obtener_cv()
+
+# Mostrar el CV generado
+print(cv_resultado.mostrar_cv())
+
+# Exportar el CV a PDF
+print(cv_resultado.exportar("PDF"))
+
+# Exportar el CV a HTML
+print(cv_resultado.exportar("HTML"))
