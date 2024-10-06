@@ -1,0 +1,128 @@
+from abc import ABC, abstractmethod
+import copy
+
+
+# Interfaz Documento (Prototipo)
+class Documento(ABC):
+    @abstractmethod
+    def clonar(self):
+        pass
+
+    @abstractmethod
+    def editar_contenido(self, nuevo_contenido):
+        pass
+
+    @abstractmethod
+    def mostrar(self):
+        pass
+
+
+# Prototipos Concretos
+class CurriculumVitae(Documento):
+    def __init__(self, estructura, formato, contenido):
+        self.estructura = estructura
+        self.formato = formato
+        self.contenido = contenido
+
+    def clonar(self):
+        # Clonación profunda para duplicar el objeto sin afectar el original
+        return copy.deepcopy(self)
+
+    def editar_contenido(self, nuevo_contenido):
+        self.contenido = nuevo_contenido
+
+    def mostrar(self):
+        return f"Curriculum Vitae - Estructura: {self.estructura}, Formato: {self.formato}, Contenido: {self.contenido}"
+
+
+class CartaPresentacion(Documento):
+    def __init__(self, estructura, formato, contenido):
+        self.estructura = estructura
+        self.formato = formato
+        self.contenido = contenido
+
+    def clonar(self):
+        # Clonación profunda
+        return copy.deepcopy(self)
+
+    def editar_contenido(self, nuevo_contenido):
+        self.contenido = nuevo_contenido
+
+    def mostrar(self):
+        return f"Carta de Presentación - Estructura: {self.estructura}, Formato: {self.formato}, Contenido: {self.contenido}"
+
+
+class Informe(Documento):
+    def __init__(self, estructura, formato, contenido):
+        self.estructura = estructura
+        self.formato = formato
+        self.contenido = contenido
+
+    def clonar(self):
+        # Clonación profunda
+        return copy.deepcopy(self)
+
+    def editar_contenido(self, nuevo_contenido):
+        self.contenido = nuevo_contenido
+
+    def mostrar(self):
+        return f"Informe - Estructura: {self.estructura}, Formato: {self.formato}, Contenido: {self.contenido}"
+
+
+# Cliente: Editor de Documentos
+class EditorDocumentos:
+    def __init__(self):
+        self.plantillas = {}
+
+    def registrar_plantilla(self, nombre, plantilla):
+        self.plantillas[nombre] = plantilla
+
+    def crear_documento(self, nombre_plantilla):
+        if nombre_plantilla in self.plantillas:
+            # Clonación del prototipo correspondiente
+            plantilla = self.plantillas[nombre_plantilla]
+            nuevo_documento = plantilla.clonar()
+            return nuevo_documento
+        else:
+            raise ValueError("La plantilla seleccionada no existe.")
+
+    def mostrar_plantillas_disponibles(self):
+        return list(self.plantillas.keys())
+
+
+# Uso del patrón Prototype
+# Crear un editor de documentos y registrar las plantillas
+editor = EditorDocumentos()
+
+# Plantillas predefinidas
+plantilla_cv = CurriculumVitae(estructura="Secciones: Información personal, Experiencia, Educación",
+                               formato="Formato Profesional",
+                               contenido="Juan Pérez, Desarrollador, Universidad UDES")
+plantilla_carta = CartaPresentacion(estructura="Formato de carta estándar",
+                                    formato="Formal",
+                                    contenido="Estimado Sr. Mendoza, le escribo para...")
+
+plantilla_informe = Informe(estructura="Secciones: Resumen, Detalles, Conclusión",
+                            formato="Formato de informe",
+                            contenido="Este es un informe detallado sobre...")
+
+# Registrar las plantillas en el editor
+editor.registrar_plantilla("Curriculum Vitae", plantilla_cv)
+editor.registrar_plantilla("Carta de Presentación", plantilla_carta)
+editor.registrar_plantilla("Informe", plantilla_informe)
+
+# Mostrar plantillas disponibles
+print("Plantillas disponibles en el editor:")
+print(editor.mostrar_plantillas_disponibles())
+
+# Crear un nuevo documento a partir de una plantilla existente (clonando)
+nuevo_cv = editor.crear_documento("Curriculum Vitae")
+nuevo_cv.editar_contenido("María López, Diseñadora Gráfica, Universidad UDES")
+
+nuevo_informe = editor.crear_documento("Informe")
+nuevo_informe.editar_contenido("Este es un informe actualizado sobre el proyecto Telco...")
+
+# Mostrar los documentos creados
+print("\nDocumentos creados:")
+print(nuevo_cv.mostrar())
+print(nuevo_informe.mostrar())
